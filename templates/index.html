@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>CipherSafe Diary</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background: #1c2028;
+            min-height: 100vh;
+        }
+        .diary-wrapper {
+            max-width: 680px;
+            margin: 40px auto 0 auto;
+            background: #fffdf5 url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            border-radius: 17px;
+            box-shadow: 0 12px 48px #00383877, 0 1.5px 0px #00ffd7 inset;
+            padding: 36px 34px 28px 34px;
+            position: relative;
+            border: 2px solid #00b3b3;
+        }
+        .notebook-lines {
+            position: absolute;
+            top: 46px; left: 28px; right: 28px; bottom: 44px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .notebook-lines div {
+            border-bottom: 1.2px dashed #d8f9f2;
+            height: 2.6em;
+        }
+        .diary-header {
+            font-family: 'Consolas', monospace;
+            color: #006f7c;
+            letter-spacing: 0.1em;
+            font-weight: bold;
+            font-size: 2.3em;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 1.5px 0px #00ffd7;
+        }
+        .meta-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.1em;
+        }
+        label.role-label {
+            color: #356;
+            font-weight: bold;
+            font-family: inherit;
+            margin: 0 6px 0 2px;
+            font-size: 1.14em;
+        }
+        select, #mode, input, textarea {
+            margin: 6px 0 6px 0;
+        }
+        .section-title {
+            font-family: 'Consolas', monospace;
+            color: #1e8295;
+            font-size: 1.03em;
+            margin-bottom: 3px;
+        }
+        #output {
+            margin: 32px auto 0 auto;
+            background: #eafcfb;
+            color: #255350;
+            font-size: 1.12em;
+            border-radius: 9px;
+            border: 1.5px solid #5ad9cf;
+            box-shadow: 0 6px 31px #00b3b366, 0 1.5px 0px #00cbd9 inset;
+            padding: 18px 13px 18px 13px;
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            min-height: 48px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="diary-wrapper">
+        <div class="notebook-lines">{% for i in range(9) %}<div></div>{% endfor %}</div>
+        <div class="diary-header">CipherSafe: Spy Diary Vault</div>
+
+        <form onsubmit="event.preventDefault();">
+            <div class="meta-row">
+                <label for="role" class="role-label">I am:</label>
+                <select id="role" style="margin-right:12px;">
+                    <option value="ZOE">Agent ZOE</option>
+                    <option value="MISATO">Agent MISATO</option>
+                </select>
+
+                <label class="role-label">Cipher:</label>
+                <select id="mode">
+                    <option value="vigenere">Vigenère (Routine)</option>
+                    <option value="vernam">Vernam OTP (Mission critical)</option>
+                </select>
+            </div>
+
+            <div class="section-title">Diary Entry or Encrypted Message:</div>
+            <textarea id="text" rows="6" placeholder="Type your secret message, confession, or command here..."></textarea>
+
+            <div class="section-title">Key / One-Time Pad (if required):</div>
+            <input id="key" type="text" placeholder="Enter or paste the shared key (for Vigenère) or OTP (for Vernam)">
+
+            <div style="margin-top: 1.4rem;">
+                <button type="button" onclick="encrypt()">Encrypt & Write</button>
+                <button type="button" onclick="decrypt()">Decrypt & Read</button>
+            </div>
+        </form>
+
+        <div id="output" style="margin-top:1.0em;"></div>
+    </div>
+
+    <script>
+    let myRole = "ZOE";
+    role.onchange = e => {
+        myRole = role.value;
+        document.title = "CipherSafe Diary — Agent " + myRole;
+    }
+    async function encrypt() {
+        output.textContent = "Encrypting...";
+        const res = await fetch('/encrypt', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ text: text.value, mode: mode.value, key: key.value, role: myRole })
+        });
+        const data = await res.json();
+        if(data.cipher) {
+            output.textContent = `Encypted as ${myRole}:\nCipher: ${data.cipher}\nKey: ${data.key}`;
+        } else {
+            output.textContent = "Encryption error: " + (data.error || "unknown issue.");
+        }
+    }
+    async function decrypt() {
+        output.textContent = "Decrypting...";
+        const res = await fetch('/decrypt', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ text: text.value, mode: mode.value, key: key.value, role: myRole })
+        });
+        const data = await res.json();
+        if(data.plain) {
+            output.textContent = `Decrypted for ${myRole}:\n${data.plain}`;
+        } else {
+            output.textContent = "Decryption error: " + (data.error || "unknown issue.");
+        }
+    }
+    </script>
+</body>
+</html>
