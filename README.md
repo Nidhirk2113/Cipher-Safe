@@ -124,8 +124,6 @@ For production cryptography, use industry-standard libraries like:
 
 ---
 
-## 🏁 Credits
 
-**Developed by:** Perplexity AI Labs (Educational Engineering Initiative)  
 **License:** MIT  
 **Version:** 1.0.0
