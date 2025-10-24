@@ -80,7 +80,7 @@ pytest tests/ -v
 ---
 
 ## 📁 Folder Structure
-
+```
 CipherSafe/
 ├── src/
 │ ├── ciphers/ # Encryption logic (Vigenère, Vernam)
@@ -99,7 +99,7 @@ CipherSafe/
 ├── tests/ # Unit tests
 └── main.py # Entry point
 
-
+```
 
 ---
 
