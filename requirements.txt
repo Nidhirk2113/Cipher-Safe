@@ -13,3 +13,7 @@ markdown==3.6
 Flask==3.0.3
 gunicorn==21.2.0
 
+#python version
+python-3.10.13
+
+
