@@ -8,3 +8,8 @@ cryptography==43.0.1
 
 # Documentation utilities (optional)
 markdown==3.6
+
+#render.com
+Flask==3.0.3
+gunicorn==21.2.0
+
